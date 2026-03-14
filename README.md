@@ -29,6 +29,8 @@ Source → Build → Sign (Cosign) → Attest Provenance → Generate SBOM (Syft
 - [Syft](https://github.com/anchore/syft) SBOM generator
 - A container registry (the example uses GHCR)
 - GitHub CLI (`gh`) for attestation verification
+- [`jq`](https://jqlang.github.io/jq/) for SBOM policy evaluation in deploy-verify.sh
+- **Registry authentication** — `gh attestation verify` for OCI images requires read access to the container registry. Run `docker login` before invoking the verification scripts (for GHCR: `echo $GITHUB_TOKEN | docker login ghcr.io -u <user> --password-stdin`)
 
 ## Quick Start
 

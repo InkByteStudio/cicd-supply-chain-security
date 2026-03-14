@@ -14,6 +14,9 @@ provenance:
 sbom:
   predicate_type: https://spdx.dev/Document/v2.3
   must_include_dependencies: true
+  require_package_names: true
+  require_package_versions: true
+  require_license_info: true
 
 exceptions:
   max_duration_hours: 24

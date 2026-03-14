@@ -10,10 +10,13 @@ build:
 dependencies:
   lockfiles:
     - package-lock.json
+  build_manifests:
     - Dockerfile
   third_party_actions:
     - actions/checkout
     - docker/build-push-action
+    - actions/attest-build-provenance
+    - actions/attest-sbom
 artifact:
   type: container-image
   registry: ghcr.io/acme/payments-api

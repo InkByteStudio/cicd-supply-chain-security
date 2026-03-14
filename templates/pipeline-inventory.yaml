@@ -1,0 +1,24 @@
+application: payments-api
+source:
+  repo: github.com/acme/payments-api
+  protected_branches:
+    - main
+build:
+  ci_platform: github-actions
+  workflow: .github/workflows/release.yml
+  runner_type: github-hosted
+dependencies:
+  lockfiles:
+    - package-lock.json
+    - Dockerfile
+  third_party_actions:
+    - actions/checkout
+    - docker/build-push-action
+artifact:
+  type: container-image
+  registry: ghcr.io/acme/payments-api
+deploy:
+  environments:
+    - staging
+    - production
+  gate: deploy-verify.sh

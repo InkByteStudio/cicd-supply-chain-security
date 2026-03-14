@@ -1,0 +1,22 @@
+required:
+  signature: true
+  provenance: true
+  sbom: true
+
+trusted_signers:
+  - issuer: https://token.actions.githubusercontent.com
+    identity_regex: https://github.com/acme/payments-api/.github/workflows/release.yml@refs/heads/main
+
+provenance:
+  trusted_repo: acme/payments-api
+  trusted_branch: refs/heads/main
+
+sbom:
+  predicate_type: https://spdx.dev/Document/v2.3
+  must_include_dependencies: true
+
+exceptions:
+  max_duration_hours: 24
+  approvers:
+    - platform-team
+    - security-team

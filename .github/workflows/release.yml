@@ -1,0 +1,79 @@
+name: release
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+  packages: write
+  id-token: write
+  attestations: write
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ghcr.io/acme/payments-api
+
+jobs:
+  build-sign:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Log in to GHCR
+        run: echo "${{ github.token }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+
+      - name: Build and push image
+        id: build
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: ${{ env.IMAGE_NAME }}:${{ github.sha }}
+
+      # Check https://github.com/sigstore/cosign/releases for latest version
+      - name: Install Cosign
+        run: |
+          COSIGN_VERSION="v3.0.5"
+          curl -fsSL -o /tmp/cosign.deb \
+            "https://github.com/sigstore/cosign/releases/download/${COSIGN_VERSION}/cosign_${COSIGN_VERSION#v}_amd64.deb"
+          sudo dpkg -i /tmp/cosign.deb
+
+      - name: Sign image digest with Sigstore keyless
+        env:
+          IMAGE_URI: ${{ env.IMAGE_NAME }}@${{ steps.build.outputs.digest }}
+        run: |
+          cosign sign --yes "${IMAGE_URI}"
+
+      - name: Generate build provenance attestation
+        uses: actions/attest-build-provenance@v3
+        with:
+          subject-name: ${{ env.IMAGE_NAME }}
+          subject-digest: ${{ steps.build.outputs.digest }}
+          push-to-registry: true
+
+      # Check https://github.com/anchore/syft/releases for latest version
+      - name: Install Syft
+        run: |
+          SYFT_VERSION="v1.42.1"
+          curl -fsSL -o /tmp/syft.tar.gz \
+            "https://github.com/anchore/syft/releases/download/${SYFT_VERSION}/syft_${SYFT_VERSION#v}_linux_amd64.tar.gz"
+          tar -xzf /tmp/syft.tar.gz -C /tmp
+          sudo mv /tmp/syft /usr/local/bin/syft
+
+      - name: Generate SPDX SBOM for image
+        env:
+          IMAGE_URI: ${{ env.IMAGE_NAME }}@${{ steps.build.outputs.digest }}
+        run: |
+          syft "${IMAGE_URI}" -o spdx-json=sbom.spdx.json
+
+      - name: Generate signed SBOM attestation
+        uses: actions/attest-sbom@v4
+        with:
+          subject-name: ${{ env.IMAGE_NAME }}
+          subject-digest: ${{ steps.build.outputs.digest }}
+          sbom-path: sbom.spdx.json
+          push-to-registry: true

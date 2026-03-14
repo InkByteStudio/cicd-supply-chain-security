@@ -50,8 +50,8 @@ Source → Build → Sign (Cosign) → Attest Provenance → Generate SBOM (Syft
 
 ## Related
 
-- [Tutorial: Harden Your CI/CD Pipeline with Sigstore, SLSA, and SBOMs](https://inkbytestudio.com/tutorials/harden-cicd-pipeline-sigstore-slsa-sboms)
-- [Blog: Software Supply Chain Security in the AI Era](https://inkbytestudio.com/blog/software-supply-chain-security-ai)
+- [Tutorial: Harden Your CI/CD Pipeline with Sigstore, SLSA, and SBOMs](https://igotasite4that.com/tutorials/harden-cicd-pipeline-sigstore-slsa-sboms)
+- [Blog: Software Supply Chain Security in the AI Era](https://igotasite4that.com/blog/software-supply-chain-security-ai)
 
 ## License
 
